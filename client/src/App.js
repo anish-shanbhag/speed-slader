@@ -10,11 +10,11 @@ export default class App extends React.Component {
   }
   render () {
     return (
-      <div class="app">
-        <div class="title">
+      <div className="app">
+        <div className="title">
           Speed Slader
         </div>
-        <div class="content">
+        <div className="content">
           <div>
             Enter your assignment below using the following syntax: (page) (assignment). <br></br>
             For example: 646 1-23 odd, 25-29 <br></br> <br></br>
@@ -26,8 +26,44 @@ export default class App extends React.Component {
       </div>
     );
   }
-  assignmentChange (assignment) {
-    const urls = assignment.replace(/\s/g, "").split(",").map(set => set.includes("odd"));
-    console.log(assignment);
+  async assignmentChange (assignment) {
+    const range = (start, end) => Array(end - start + 1).fill().map((_, idx) => start + idx);
+    const problems = assignment.replace(/\s/g, "").split(",").map(set => {
+      const odd = set.includes("odd");
+      const [start, end] = set.replace("odd", "").split("-").map(number => parseInt(number));
+      return range(start, end ? end : start).filter(problem => !odd || problem % 2 === 1);
+    }).flat().sort((a, b) => a - b);
+
+    problems.forEach(async problem => {
+      (await new Promise(async (resolve, reject) => {
+        try {
+          resolve([await axios({
+            method: "GET",
+            url: "http://localhost:4000",
+            params: {
+              problem
+            }
+          })]);
+        } catch {
+          const images = [];
+          try {
+            for (let letter = "a";; letter = String.fromCharCode(letter.charCodeAt() + 1)) {
+              images.push(await axios({
+                method: "GET",
+                url: "http://localhost:4000",
+                params: {
+                  problem: problem + letter
+                }
+              }))
+            }
+          } catch {
+            if (images.length === 0) reject(new Error("Invalid problem!"));
+            else resolve(images);
+          }
+        }
+      })).forEach(images => {
+        console.log(images);
+      })
+    });
   }
 }
