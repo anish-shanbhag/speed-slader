@@ -12,8 +12,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 const limit = pLimit(3);
-let requests = 0;
-let start = Date.now();
 
 app.get("/", (req, res, next) => {
   limit(async () => {
@@ -64,7 +62,6 @@ app.get("/", (req, res, next) => {
     } catch (e) {
       next(e);
     } finally {
-      console.log((Date.now() - start) / requests);
       await browser.close();
     }
   });
