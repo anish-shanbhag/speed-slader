@@ -23,8 +23,8 @@ app.get("/", (req, res, next) => {
     });
     const page = await browser.newPage();
     await page.setViewport({
-      width: 1920,
-      height: 1080
+      width: 900,
+      height: 400
     });
     try {
       let navigated = false;
@@ -48,11 +48,15 @@ app.get("/", (req, res, next) => {
       let image;
       while (!screenshotted) {
         try {
+          await page.setViewport({
+            width: 900,
+            height: Math.floor((await solution.boundingBox()).height) + 400
+          });
           image = await solution.screenshot({
             encoding: "base64"
           });
           screenshotted = true;
-        } catch {
+        } catch (e) {
           continue;
         }
       }

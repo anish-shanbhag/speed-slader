@@ -32,7 +32,7 @@ export default class App extends React.Component {
           </div>
           <input type="text" onChange={e => this.throttleAssignmentChange(e.target.value)}></input>
           <div>
-            You can also enter a smaller range of problems in the text box below to view just those problems
+            You can also enter a smaller range of problems in the text box below to view just those problems. <br></br>
             For example, entering "489 1-23 odd" in the assignment text box and then just "4-5" in the text box below would only show problems 4 and 5 from that assignment.
           </div>
           <input type="text" onChange={e => this.changeRange(e.target.value)}></input>
@@ -44,12 +44,10 @@ export default class App extends React.Component {
               loading={this.state.loading}
             />
             {this.state.rangeError ? "Invalid problem range." : this.state.range && this.state.solutions.filter(solution => this.state.range.length === 0 || this.state.range.includes(solution.problem)).map(solution =>
-              <>
-              <div className="solution-container">
+              <div className="solution-container" key={solution.problem + (solution.letter ? solution.letter : "")}>
                 <div className="solution-problem">{solution.letter ? solution.problem + solution.letter : solution.problem}.</div>
-                <img src={'data:image/png;base64,' + solution.image.data} width="95%"></img>
+                <img src={'data:image/png;base64,' + solution.image.data} width="95%" alt={solution.problem + (solution.letter ? solution.letter : "")}></img>
               </div>
-              </>
             )}
           </div>
         </div>
@@ -65,7 +63,7 @@ export default class App extends React.Component {
     }));
     try {
       const page = assignment.substring(0, assignment.indexOf(" "));
-      let problems = this.getRange(assignment.substring(assignment.indexOf(" ")));
+      let problems = assignment.length === 0 ? [] : this.getRange(assignment.substring(assignment.indexOf(" ")));
       const getFilteredSolutions = state => state.page === page ? state.solutions.filter(solution => problems.includes(solution.problem)) : [];
       this.setState(state => ({
         solutions: getFilteredSolutions(state),
