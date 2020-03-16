@@ -5,7 +5,7 @@ const puppeteer = require("puppeteer");
 const pLimit = require("p-limit");
 
 const app = express();
-const port = process.env.dev ? 4000 : process.env.$PORT;
+const port = process.env.dev ? 4000 : process.env.PORT;
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
