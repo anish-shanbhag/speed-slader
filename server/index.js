@@ -1,5 +1,4 @@
 const express = require("express");
-const cors = require("cors");
 const bodyParser = require("body-parser");
 const puppeteer = require("puppeteer");
 const pLimit = require("p-limit");
@@ -7,7 +6,12 @@ const pLimit = require("p-limit");
 const app = express();
 const port = process.env.dev ? 4000 : process.env.PORT;
 
-app.use(cors());
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "anish-shanbhag.github.io");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
