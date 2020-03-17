@@ -114,7 +114,7 @@ export default class App extends React.Component {
       letter,
       image: await axios({
         method: "GET",
-        url: this._self ? "http://localhost:4000/api" : "https://speed-slader-server.herokuapp.com/api",
+        url: this._self ? "http://localhost:4000/api" : "https://speed-slader.herokuapp.com/api",
         params: {
           page,
           problem: letter ? problem + letter : problem
