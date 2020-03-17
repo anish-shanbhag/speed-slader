@@ -1,17 +1,19 @@
 const express = require("express");
+const path = require("path");
 const bodyParser = require("body-parser");
 const puppeteer = require("puppeteer");
 const pLimit = require("p-limit");
 
 const app = express();
-const port = process.env.dev ? 4000 : process.env.PORT;
+const port = process.env.PORT || 4000;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 const limit = pLimit(3);
 
-app.get("/", (req, res, next) => {
+app.get("/api", (req, res, next) => {
   limit(async () => {
     const browser = await puppeteer.launch({
       args: ["--no-sandbox", "--disable-setuid-sandbox"]
@@ -64,4 +66,8 @@ app.get("/", (req, res, next) => {
   });
 });
 
-app.listen(port, () => console.log(`App listening on port ${port}.`))
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname+'/client/build/index.html'));
+});
+
+app.listen(port, () => console.log(`App listening on port ${port}.`));
