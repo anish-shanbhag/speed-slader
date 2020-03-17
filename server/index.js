@@ -15,7 +15,6 @@ const limit = pLimit(3);
 
 app.get("/", (req, res, next) => {
   limit(async () => {
-    requests++;
     const browser = await puppeteer.launch({
       args: ["--no-sandbox", "--disable-setuid-sandbox"]
     });
