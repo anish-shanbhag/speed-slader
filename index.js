@@ -11,7 +11,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'client/build')));
 
-const limit = pLimit(3);
+const limit = pLimit(2);
 
 app.get("/api", (req, res, next) => {
   limit(async () => {
