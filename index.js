@@ -7,7 +7,9 @@ const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 4000;
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'client/build')));
 app.use(cors());
@@ -24,41 +26,20 @@ app.get("/api", async (req, res, next) => {
     height: 400
   });
   try {
-    let navigated = false;
-    while (!navigated) {
-      try {
-        await page.goto(`https://www.slader.com/textbook/9781285740621-stewart-calculus-8th-edition/${req.query.page}/exercises/${req.query.problem}/`, {
-          timeout: 10000
-        });
-        navigated = true;
-      } catch (e) {
-        console.error("Originated from navigating: " + e);
-        continue;
-      }
-    }
+    await page.goto(`https://www.slader.com/textbook/9781285740621-stewart-calculus-8th-edition/${req.query.page}/exercises/${req.query.problem}/`);
     await page.waitFor(".contents, .return-home-button");
     const solution = await page.$(".contents");
     if (!solution) {
       next(new Error(`Problem ${req.query.problem} is not on page ${req.query.page}.`));
       return;
     }
-    let screenshotted = false;
-    let image;
-    while (!screenshotted) {
-      try {
-        await page.setViewport({
-          width: 900,
-          height: Math.floor((await solution.boundingBox()).height) + 400
-        });
-        image = await solution.screenshot({
-          encoding: "base64"
-        });
-        screenshotted = true;
-      } catch (e) {
-        console.error("Originated from screenshotting: " + e);
-        continue;
-      }
-    }
+    await page.setViewport({
+      width: 900,
+      height: Math.floor((await solution.boundingBox()).height) + 400
+    });
+    const image = await solution.screenshot({
+      encoding: "base64"
+    });
     console.log("Successfully screenshotted solution.");
     res.send(image);
   } catch (e) {
@@ -70,7 +51,7 @@ app.get("/api", async (req, res, next) => {
 });
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname+'/client/build/index.html'));
+  res.sendFile(path.join(__dirname + '/client/build/index.html'));
 });
 
 app.listen(port, () => console.log(`App listening on port ${port}.`));
