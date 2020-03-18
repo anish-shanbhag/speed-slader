@@ -3,11 +3,13 @@ import './App.css';
 import HashLoader from "react-spinners/HashLoader";
 import _ from "lodash";
 import axios from "axios";
+import pLimit from "p-limit";
 
 export default class App extends React.Component {
   constructor () {
     super();
     this.throttleAssignmentChange = _.debounce(this.assignmentChange, 1000);
+    this.limit = pLimit(2);
     this.state = {
       solutions: [],
       range: [],
@@ -70,12 +72,13 @@ export default class App extends React.Component {
         page,
         promises: []
       }));
-      problems = problems.filter(problem => !getFilteredSolutions(this.state).map(solution => solution.problem).includes(problem)).map(async problem => {
-        return (new Promise(async (resolve, reject) => {
+      problems = problems.filter(problem => !getFilteredSolutions(this.state).map(solution => solution.problem).includes(problem)).map(problem => {
+        return this.limit(() => (new Promise(async (resolve, reject) => {
           try {
             await this.addSolution(this.state.id, page, problem);
             resolve();
           } catch (e) {
+            console.log(e);
             let letters = 0;
             for (let letter = "a";; letter = String.fromCharCode(letter.charCodeAt() + 1)) {
               try {
@@ -93,7 +96,7 @@ export default class App extends React.Component {
           this.setState({
             error: true
           });
-        });
+        }));
       });
       await Promise.all(problems);
       if (this.state.id === oldID + 1) {
@@ -102,7 +105,6 @@ export default class App extends React.Component {
         });
       }
     } catch (e) {
-      console.error(e);
       this.setState({
         error: true
       });
@@ -114,7 +116,7 @@ export default class App extends React.Component {
       letter,
       image: await axios({
         method: "GET",
-        url: this._self ? "http://localhost:4000/api" : "https://speed-slader.herokuapp.com/api",
+        url: "_self" in React.createElement("div") ? "http://localhost:4000/api" : "https://speed-slader.herokuapp.com/api",
         params: {
           page,
           problem: letter ? problem + letter : problem
