@@ -13,9 +13,11 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 app.use(cors());
 
 app.get("/api", async (req, res, next) => {
+  console.log("Received request.");
   const browser = await puppeteer.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox"]
   });
+  console.log("Launched browser.");
   const page = await browser.newPage();
   await page.setViewport({
     width: 900,
@@ -29,7 +31,8 @@ app.get("/api", async (req, res, next) => {
           timeout: 10000
         });
         navigated = true;
-      } catch {
+      } catch (e) {
+        console.error("Originated from navigating: " + e);
         continue;
       }
     }
@@ -52,13 +55,16 @@ app.get("/api", async (req, res, next) => {
         });
         screenshotted = true;
       } catch (e) {
+        console.error("Originated from screenshotting: " + e);
         continue;
       }
     }
+    console.log("Successfully screenshotted solution.");
     res.send(image);
   } catch (e) {
     next(e);
   } finally {
+    console.log("Browser closed.");
     await browser.close();
   }
 });
