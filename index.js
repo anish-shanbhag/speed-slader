@@ -16,6 +16,7 @@ app.use(cors());
 
 app.get("/api", async (req, res, next) => {
   console.log("Received request.");
+  const responseInterval = setInterval(() => res.write(" "), 10000);
   const browser = await puppeteer.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox"]
   });
@@ -41,8 +42,10 @@ app.get("/api", async (req, res, next) => {
       encoding: "base64"
     });
     console.log("Successfully screenshotted solution.");
-    res.send(image);
+    clearInterval(responseInterval);
+    res.end(image);
   } catch (e) {
+    clearInterval(responseInterval);
     next(e);
   } finally {
     console.log("Browser closed.");
