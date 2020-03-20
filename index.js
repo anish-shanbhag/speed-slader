@@ -28,7 +28,9 @@ app.get("/api", async (req, res, next) => {
   });
   try {
     await page.goto(`https://www.slader.com/textbook/9781285740621-stewart-calculus-8th-edition/${req.query.page}/exercises/${req.query.problem}/`);
-    await page.waitFor(".contents, .return-home-button");
+    await page.waitFor(".contents, .return-home-button", {
+      visible: true
+    });
     const solution = await page.$(".contents");
     if (!solution) {
       next(new Error(`Problem ${req.query.problem} is not on page ${req.query.page}.`));
@@ -45,9 +47,9 @@ app.get("/api", async (req, res, next) => {
     clearInterval(responseInterval);
     res.end(image);
   } catch (e) {
-    clearInterval(responseInterval);
     next(e);
   } finally {
+    clearInterval(responseInterval);
     console.log("Browser closed.");
     await browser.close();
   }
