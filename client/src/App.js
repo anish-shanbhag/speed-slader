@@ -35,7 +35,7 @@ export default class App extends React.Component {
           <input type="text" onChange={e => this.throttleAssignmentChange(e.target.value)}></input>
           <div>
             You can also enter a smaller range of problems in the text box below to view just those problems. <br></br>
-            For example, entering "489 1-23 odd" in the assignment text box and then just "4-5" in the text box below would only show problems 4 and 5 from that assignment.
+            For example, entering "489 1-23 odd" in the assignment text box and then just "3-5" in the text box below would only show problems 3 and 5 from that assignment.
           </div>
           <input type="text" onChange={e => this.changeRange(e.target.value)}></input>
           <div>
